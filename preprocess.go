@@ -5,7 +5,6 @@ package readability
 
 import (
 	"regexp"
-	"strings"
 
 	"github.com/mackee/go-readability/internal/dom"
 )
@@ -153,35 +152,4 @@ func isLikelyAd(element *dom.VElement) bool {
 	}
 
 	return false
-}
-
-// isVisible determines if an element is visible.
-// It checks CSS properties and attributes to determine if an element
-// would be visible to a user in a browser.
-//
-// Parameters:
-//   - element: The element to check
-//
-// Returns:
-//   - true if the element is likely visible, false otherwise
-func isVisible(element *dom.VElement) bool {
-	// Check style attribute
-	style := element.GetAttribute("style")
-	if strings.Contains(style, "display: none") ||
-		strings.Contains(style, "visibility: hidden") ||
-		strings.Contains(style, "opacity: 0") {
-		return false
-	}
-
-	// Check hidden attribute
-	if element.HasAttribute("hidden") {
-		return false
-	}
-
-	// Check aria-hidden attribute
-	if element.GetAttribute("aria-hidden") == "true" {
-		return false
-	}
-
-	return true
 }

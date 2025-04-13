@@ -18,14 +18,14 @@ func TestGetArticleTitle(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Simple Title"))
 				head.AppendChild(title)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Simple Title",
@@ -36,14 +36,14 @@ func TestGetArticleTitle(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Main Title | Site Name"))
 				head.AppendChild(title)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Site Name",
@@ -54,14 +54,14 @@ func TestGetArticleTitle(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Site Name: Article Title"))
 				head.AppendChild(title)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Article Title",
@@ -72,18 +72,18 @@ func TestGetArticleTitle(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("This is a very long title that exceeds the 150 character limit and should be replaced with the h1 content. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."))
 				head.AppendChild(title)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				h1 := dom.NewVElement("h1")
 				h1.AppendChild(dom.NewVText("H1 Title"))
 				body.AppendChild(h1)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "H1 Title",
@@ -94,18 +94,18 @@ func TestGetArticleTitle(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Exact Match: This is the title"))
 				head.AppendChild(title)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				h1 := dom.NewVElement("h1")
 				h1.AppendChild(dom.NewVText("Exact Match: This is the title"))
 				body.AppendChild(h1)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Exact Match: This is the title",
@@ -116,7 +116,7 @@ func TestGetArticleTitle(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			doc := tc.setupDoc()
 			title := GetArticleTitle(doc)
-			
+
 			if title != tc.expected {
 				t.Errorf("Expected title '%s', got '%s'", tc.expected, title)
 			}
@@ -136,15 +136,15 @@ func TestGetArticleByline(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("name", "author")
 				meta.SetAttribute("content", "John Doe")
 				head.AppendChild(meta)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "John Doe",
@@ -155,15 +155,15 @@ func TestGetArticleByline(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("property", "dc:creator")
 				meta.SetAttribute("content", "Jane Smith")
 				head.AppendChild(meta)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Jane Smith",
@@ -174,15 +174,15 @@ func TestGetArticleByline(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("property", "article:author")
 				meta.SetAttribute("content", "Alice Johnson")
 				head.AppendChild(meta)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Alice Johnson",
@@ -193,21 +193,21 @@ func TestGetArticleByline(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("property", "article:author")
 				meta.SetAttribute("content", "https://example.com/author/bob")
 				head.AppendChild(meta)
-				
+
 				// Add another meta tag that should be used instead
 				meta2 := dom.NewVElement("meta")
 				meta2.SetAttribute("name", "author")
 				meta2.SetAttribute("content", "Bob Williams")
 				head.AppendChild(meta2)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Bob Williams",
@@ -218,15 +218,15 @@ func TestGetArticleByline(t *testing.T) {
 				html := dom.NewVElement("html")
 				head := dom.NewVElement("head")
 				html.AppendChild(head)
-				
+
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("name", "author")
 				meta.SetAttribute("content", "Charlie &amp; Dave")
 				head.AppendChild(meta)
-				
+
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			expected: "Charlie & Dave",
@@ -237,7 +237,7 @@ func TestGetArticleByline(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			doc := tc.setupDoc()
 			byline := GetArticleByline(doc)
-			
+
 			if byline != tc.expected {
 				t.Errorf("Expected byline '%s', got '%s'", tc.expected, byline)
 			}
@@ -291,7 +291,7 @@ func TestUnescapeHTMLEntities(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := UnescapeHTMLEntities(tc.input)
-			
+
 			if result != tc.expected {
 				t.Errorf("Expected '%s', got '%s'", tc.expected, result)
 			}
@@ -354,7 +354,7 @@ func TestTextSimilarity(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			similarity := TextSimilarity(tc.textA, tc.textB)
-			
+
 			if similarity < tc.expected-tc.delta || similarity > tc.expected+tc.delta {
 				t.Errorf("Expected similarity around %.2f, got %.2f", tc.expected, similarity)
 			}

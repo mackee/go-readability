@@ -36,7 +36,7 @@ func Extract(html string, options ReadabilityOptions) (ReadabilityArticle, error
 	if options.CharThreshold <= 0 {
 		options.CharThreshold = util.DefaultCharThreshold
 	}
-	
+
 	if options.NbTopCandidates <= 0 {
 		options.NbTopCandidates = util.DefaultNTopCandidates
 	}
@@ -66,12 +66,12 @@ func ExtractContent(doc *dom.VDocument, options ReadabilityOptions) ReadabilityA
 	if charThreshold <= 0 {
 		charThreshold = util.DefaultCharThreshold
 	}
-	
+
 	nbTopCandidates := options.NbTopCandidates
 	if nbTopCandidates <= 0 {
 		nbTopCandidates = util.DefaultNTopCandidates
 	}
-	
+
 	generateAriaTree := options.GenerateAriaTree
 
 	// Find content candidates
@@ -122,19 +122,20 @@ func ExtractContent(doc *dom.VDocument, options ReadabilityOptions) ReadabilityA
 	if generateAriaTree || (articleContent == nil && pageType == PageTypeArticle) {
 		// AriaTree generation would be implemented here
 		// For now, we'll leave it as nil
+		ariaTree = nil
 	}
 
 	// Create and return the article
 	return ReadabilityArticle{
-		Title:                title,
-		Byline:               byline,
-		Root:                 articleContent,
-		NodeCount:            CountNodes(articleContent),
-		PageType:             pageType,
-		Header:               header,
-		Footer:               footer,
+		Title:                 title,
+		Byline:                byline,
+		Root:                  articleContent,
+		NodeCount:             CountNodes(articleContent),
+		PageType:              pageType,
+		Header:                header,
+		Footer:                footer,
 		OtherSignificantNodes: otherSignificantNodes,
-		AriaTree:             ariaTree,
+		AriaTree:              ariaTree,
 	}
 }
 
@@ -168,7 +169,7 @@ func FindStructuralElements(doc *dom.VDocument) (
 			role := strings.ToLower(GetAttribute(el, "role"))
 			id := strings.ToLower(el.ID())
 			className := strings.ToLower(el.ClassName())
-			
+
 			if role == "banner" ||
 				id == "header" ||
 				id == "masthead" ||
@@ -195,7 +196,7 @@ func FindStructuralElements(doc *dom.VDocument) (
 			role := strings.ToLower(GetAttribute(el, "role"))
 			id := strings.ToLower(el.ID())
 			className := strings.ToLower(el.ClassName())
-			
+
 			if role == "contentinfo" ||
 				id == "footer" ||
 				id == "colophon" ||
@@ -314,7 +315,7 @@ func AddSignificantElementsByClassOrId(body *dom.VElement, potentialNodes *[]*do
 						break
 					}
 				}
-				
+
 				if !alreadyIncluded {
 					*potentialNodes = append(*potentialNodes, el)
 				}
@@ -395,9 +396,9 @@ func FindMainCandidates(doc *dom.VDocument, nbTopCandidates int) []*dom.VElement
 		}
 
 		// Calculate base score
-		contentScore := 1.0 // Base points
+		contentScore := 1.0                                                            // Base points
 		contentScore += float64(len(util.Regexps.Commas.FindAllString(innerText, -1))) // Number of commas
-		contentScore += float64(min(len(innerText)/100, 3)) // Text length (max 3 points)
+		contentScore += float64(min(len(innerText)/100, 3))                            // Text length (max 3 points)
 
 		// Add score to ancestor elements
 		for level, ancestor := range ancestors {
@@ -536,11 +537,7 @@ func IsProbablyContent(element *dom.VElement) bool {
 	// Check text density
 	// If text density is extremely low, it's unlikely to be the main content
 	textDensity := GetTextDensity(element)
-	if textDensity < 0.1 {
-		return false
-	}
-
-	return true
+	return textDensity >= 0.1
 }
 
 // InitializeNode initializes a node with a readability score.

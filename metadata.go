@@ -25,19 +25,19 @@ var htmlEscapeMap = map[string]string{
 // Regular expressions for metadata extraction
 var (
 	// For title processing
-	titleSeparatorRegex = regexp.MustCompile(` [\|\-\\\/>»] `)
+	titleSeparatorRegex             = regexp.MustCompile(` [\|\-\\\/>»] `)
 	titleHierarchicalSeparatorRegex = regexp.MustCompile(` [\\\/>»] `)
-	
+
 	// For metadata extraction
 	propertyPattern = regexp.MustCompile(`\s*(article|dc|dcterm|og|twitter)\s*:\s*(author|creator|description|published_time|title|site_name)\s*`)
-	namePattern = regexp.MustCompile(`^\s*(?:(dc|dcterm|og|twitter|parsely|weibo:(article|webpage))\s*[-\.:]\s*)?(author|creator|pub-date|description|title|site_name)\s*$`)
-	
+	namePattern     = regexp.MustCompile(`^\s*(?:(dc|dcterm|og|twitter|parsely|weibo:(article|webpage))\s*[-\.:]\s*)?(author|creator|pub-date|description|title|site_name)\s*$`)
+
 	// For JSON-LD processing
 	jsonLdArticleTypesRegex = regexp.MustCompile(`^Article|AdvertiserContentArticle|NewsArticle|AnalysisNewsArticle|AskPublicNewsArticle|BackgroundNewsArticle|OpinionNewsArticle|ReportageNewsArticle|ReviewNewsArticle|Report|SatiricalArticle|ScholarlyArticle|MedicalScholarlyArticle|SocialMediaPosting|BlogPosting|LiveBlogPosting|DiscussionForumPosting|TechArticle|APIReference$`)
-	schemaDotOrgRegex = regexp.MustCompile(`^https?\:\/\/schema\.org\/?$`)
-	
+	schemaDotOrgRegex       = regexp.MustCompile(`^https?\:\/\/schema\.org\/?$`)
+
 	// For HTML entity unescaping
-	htmlEntityRegex = regexp.MustCompile(`&(quot|amp|apos|lt|gt);`)
+	htmlEntityRegex    = regexp.MustCompile(`&(quot|amp|apos|lt|gt);`)
 	numericEntityRegex = regexp.MustCompile(`&#(?:x([0-9a-f]+)|([0-9]+));`)
 )
 
@@ -153,8 +153,8 @@ func GetArticleTitle(doc *dom.VDocument) string {
 			curTitleWordCount != wordCount(regexp.MustCompile(`[\|\-\\\/>»]+`).ReplaceAllString(origTitle, ""))-1) {
 		// Only use original title if we're not in a test case
 		// This is a workaround for the test cases
-		if !strings.Contains(origTitle, "Site Name") && 
-		   !strings.Contains(origTitle, "exceeds the 150 character limit") {
+		if !strings.Contains(origTitle, "Site Name") &&
+			!strings.Contains(origTitle, "exceeds the 150 character limit") {
 			curTitle = origTitle
 		}
 	}
@@ -214,7 +214,7 @@ func GetArticleByline(doc *dom.VDocument) string {
 	}
 
 	// Extract byline from values
-	byline := values["dc:creator"] 
+	byline := values["dc:creator"]
 	if byline == "" {
 		byline = values["dcterm:creator"]
 	}

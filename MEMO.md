@@ -75,7 +75,12 @@ go tool gotests -all ./path/to/file.go
 
 # dlv (デバッガー)の使用例
 go tool dlv debug ./path/to/main.go
+
+# golangci-lintの使用例
+go tool golangci-lint run
 ```
+
+**重要**: golangci-lintを実行する際は、スタンドアロンのバイナリではなく、`go tool` コマンドを使用してください。これにより、Go 1.24のツールチェーンと統合されたlinterが使用されます。
 
 これらのツールは従来の方法（$GOPATH/bin にインストールしてPATHに追加）と異なり、Go 1.24の新しいツール管理システムを使用しています。これによりバージョン管理とツールのインストールがより簡単になりました。
 

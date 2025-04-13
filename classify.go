@@ -189,7 +189,7 @@ func ClassifyPageType(
 			secondScore = candidates[1].GetReadabilityData().ContentScore
 		}
 
-		var scoreRatio float64 = 1.0
+		scoreRatio := 1.0
 		if topScore > 0 {
 			scoreRatio = secondScore / topScore
 		}

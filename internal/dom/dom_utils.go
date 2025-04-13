@@ -53,10 +53,10 @@ func IsProbablyVisible(node *VElement) bool {
 	hidden := node.HasAttribute("hidden")
 	ariaHidden := node.GetAttribute("aria-hidden") == "true"
 
-	return !(strings.Contains(style, "display: none") ||
-		strings.Contains(style, "visibility: hidden") ||
-		hidden ||
-		ariaHidden)
+	return !strings.Contains(style, "display: none") &&
+		!strings.Contains(style, "visibility: hidden") &&
+		!hidden &&
+		!ariaHidden
 }
 
 // GetNodeAncestors returns the ancestor elements of a node up to a specified depth.

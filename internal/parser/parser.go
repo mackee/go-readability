@@ -4,6 +4,7 @@ package parser
 import (
 	"bytes"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/mackee/go-readability/internal/dom"
@@ -145,8 +146,15 @@ func SerializeToHTML(node dom.VNode) string {
 	buf.WriteString("<")
 	buf.WriteString(element.TagName)
 
-	// Attributes
-	for key, value := range element.Attributes {
+	// Attributes - sort keys to ensure consistent output order
+	var keys []string
+	for key := range element.Attributes {
+		keys = append(keys, key)
+	}
+	// Sort keys alphabetically for consistent output
+	sort.Strings(keys)
+	for _, key := range keys {
+		value := element.Attributes[key]
 		buf.WriteString(" ")
 		buf.WriteString(key)
 		buf.WriteString("=\"")

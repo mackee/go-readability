@@ -235,13 +235,11 @@ func TestAriaTreeToString(t *testing.T) {
 
 	// Check that the output contains expected elements
 	expectedSubstrings := []string{
-		"- main",
-		"\"Main Content\"",
-		"- heading",
-		"\"Title\"",
-		"[level=1]",
-		"- text",
-		": Paragraph text",
+		"main: Main Content",
+		"children:",
+		"heading: Title",
+		"level: 1",
+		"text: Paragraph text",
 	}
 
 	for _, substr := range expectedSubstrings {

@@ -10,11 +10,11 @@ import (
 func TestFindMainCandidates(t *testing.T) {
 	// Test cases for FindMainCandidates
 	testCases := []struct {
-		name           string
-		setupDoc       func() *dom.VDocument
+		name            string
+		setupDoc        func() *dom.VDocument
 		nbTopCandidates int
-		expectedCount  int
-		checkFirst     func(t *testing.T, element *dom.VElement)
+		expectedCount   int
+		checkFirst      func(t *testing.T, element *dom.VElement)
 	}{
 		{
 			name: "single article tag",
@@ -22,11 +22,11 @@ func TestFindMainCandidates(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				article := dom.NewVElement("article")
 				article.AppendChild(dom.NewVText("This is an article with enough text to be considered."))
 				body.AppendChild(article)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			nbTopCandidates: 5,
@@ -43,11 +43,11 @@ func TestFindMainCandidates(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				main := dom.NewVElement("main")
 				main.AppendChild(dom.NewVText("This is a main section with enough text to be considered."))
 				body.AppendChild(main)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			nbTopCandidates: 5,
@@ -64,7 +64,7 @@ func TestFindMainCandidates(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Create a div with content class (high score)
 				contentDiv := dom.NewVElement("div")
 				contentDiv.SetAttribute("class", "content")
@@ -72,7 +72,7 @@ func TestFindMainCandidates(t *testing.T) {
 				p1.AppendChild(dom.NewVText("This is a paragraph with enough text to be considered. It has commas, and more text."))
 				contentDiv.AppendChild(p1)
 				body.AppendChild(contentDiv)
-				
+
 				// Create a div with sidebar class (low score)
 				sidebarDiv := dom.NewVElement("div")
 				sidebarDiv.SetAttribute("class", "sidebar")
@@ -80,7 +80,7 @@ func TestFindMainCandidates(t *testing.T) {
 				p2.AppendChild(dom.NewVText("This is another paragraph with enough text to be considered."))
 				sidebarDiv.AppendChild(p2)
 				body.AppendChild(sidebarDiv)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			nbTopCandidates: 2,
@@ -97,12 +97,12 @@ func TestFindMainCandidates(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Add some elements but with very little text
 				div := dom.NewVElement("div")
 				div.AppendChild(dom.NewVText("Short text."))
 				body.AppendChild(div)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			nbTopCandidates: 5,
@@ -119,7 +119,7 @@ func TestFindMainCandidates(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Create multiple divs with content
 				for i := 0; i < 5; i++ {
 					div := dom.NewVElement("div")
@@ -128,12 +128,12 @@ func TestFindMainCandidates(t *testing.T) {
 					div.AppendChild(p)
 					body.AppendChild(div)
 				}
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			nbTopCandidates: 3,
 			expectedCount:   3,
-			checkFirst: nil, // No specific check for first element
+			checkFirst:      nil, // No specific check for first element
 		},
 	}
 
@@ -141,11 +141,11 @@ func TestFindMainCandidates(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			doc := tc.setupDoc()
 			candidates := FindMainCandidates(doc, tc.nbTopCandidates)
-			
+
 			if len(candidates) != tc.expectedCount {
 				t.Errorf("Expected %d candidates, got %d", tc.expectedCount, len(candidates))
 			}
-			
+
 			if len(candidates) > 0 && tc.checkFirst != nil {
 				tc.checkFirst(t, candidates[0])
 			}
@@ -156,23 +156,23 @@ func TestFindMainCandidates(t *testing.T) {
 func TestIsProbablyContent(t *testing.T) {
 	// Test cases for IsProbablyContent
 	testCases := []struct {
-		name           string
-		setupElement   func() *dom.VElement
-		expected       bool
+		name         string
+		setupElement func() *dom.VElement
+		expected     bool
 	}{
 		{
 			name: "visible element with good content",
 			setupElement: func() *dom.VElement {
 				div := dom.NewVElement("div")
 				div.SetAttribute("class", "content")
-				
+
 				// Add enough text to pass the length check
 				longText := "This is a long text that should be considered as content. " +
 					"It has multiple sentences and is definitely longer than 140 characters. " +
 					"This should be enough to pass the text length check in the IsProbablyContent function. " +
 					"We need to make sure it's long enough."
 				div.AppendChild(dom.NewVText(longText))
-				
+
 				return div
 			},
 			expected: true,
@@ -182,12 +182,12 @@ func TestIsProbablyContent(t *testing.T) {
 			setupElement: func() *dom.VElement {
 				div := dom.NewVElement("div")
 				div.SetAttribute("style", "display: none;")
-				
+
 				// Add enough text to pass the length check
 				longText := "This is a long text that should be considered as content. " +
 					"It has multiple sentences and is definitely longer than 140 characters."
 				div.AppendChild(dom.NewVText(longText))
-				
+
 				return div
 			},
 			expected: false,
@@ -197,12 +197,12 @@ func TestIsProbablyContent(t *testing.T) {
 			setupElement: func() *dom.VElement {
 				div := dom.NewVElement("div")
 				div.SetAttribute("class", "sidebar")
-				
+
 				// Add enough text to pass the length check
 				longText := "This is a long text that should be considered as content. " +
 					"It has multiple sentences and is definitely longer than 140 characters."
 				div.AppendChild(dom.NewVText(longText))
-				
+
 				return div
 			},
 			expected: false,
@@ -212,11 +212,11 @@ func TestIsProbablyContent(t *testing.T) {
 			setupElement: func() *dom.VElement {
 				div := dom.NewVElement("div")
 				div.SetAttribute("class", "content")
-				
+
 				// Add short text that won't pass the length check
 				shortText := "This is a short text."
 				div.AppendChild(dom.NewVText(shortText))
-				
+
 				return div
 			},
 			expected: false,
@@ -225,19 +225,19 @@ func TestIsProbablyContent(t *testing.T) {
 			name: "element with high link density",
 			setupElement: func() *dom.VElement {
 				div := dom.NewVElement("div")
-				
+
 				// Add a paragraph with some text
 				p := dom.NewVElement("p")
 				p.AppendChild(dom.NewVText("This is some text. "))
 				div.AppendChild(p)
-				
+
 				// Add many links to increase link density
 				for i := 0; i < 10; i++ {
 					a := dom.NewVElement("a")
 					a.AppendChild(dom.NewVText("Link text that is quite long to increase the link density."))
 					div.AppendChild(a)
 				}
-				
+
 				return div
 			},
 			expected: false,
@@ -248,7 +248,7 @@ func TestIsProbablyContent(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			element := tc.setupElement()
 			result := IsProbablyContent(element)
-			
+
 			if result != tc.expected {
 				t.Errorf("Expected IsProbablyContent to return %v, got %v", tc.expected, result)
 			}
@@ -341,9 +341,9 @@ func TestInitializeNode(t *testing.T) {
 
 func TestGetClassWeight(t *testing.T) {
 	testCases := []struct {
-		name          string
-		className     string
-		id            string
+		name           string
+		className      string
+		id             string
 		expectedWeight float64
 	}{
 		{
@@ -414,14 +414,14 @@ func TestGetClassWeight(t *testing.T) {
 
 func TestFindStructuralElements(t *testing.T) {
 	testCases := []struct {
-		name                    string
-		setupDoc                func() *dom.VDocument
-		expectHeader            bool
-		expectFooter            bool
-		expectSignificantNodes  int
-		checkHeader             func(t *testing.T, header *dom.VElement)
-		checkFooter             func(t *testing.T, footer *dom.VElement)
-		checkSignificantNodes   func(t *testing.T, nodes []*dom.VElement)
+		name                   string
+		setupDoc               func() *dom.VDocument
+		expectHeader           bool
+		expectFooter           bool
+		expectSignificantNodes int
+		checkHeader            func(t *testing.T, header *dom.VElement)
+		checkFooter            func(t *testing.T, footer *dom.VElement)
+		checkSignificantNodes  func(t *testing.T, nodes []*dom.VElement)
 	}{
 		{
 			name: "single header and footer tags",
@@ -429,24 +429,24 @@ func TestFindStructuralElements(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				header := dom.NewVElement("header")
 				header.AppendChild(dom.NewVText("This is a header"))
 				body.AppendChild(header)
-				
+
 				content := dom.NewVElement("div")
 				content.SetAttribute("class", "content")
 				content.AppendChild(dom.NewVText("This is the main content"))
 				body.AppendChild(content)
-				
+
 				footer := dom.NewVElement("footer")
 				footer.AppendChild(dom.NewVText("This is a footer"))
 				body.AppendChild(footer)
-				
+
 				return dom.NewVDocument(html, body)
 			},
-			expectHeader: true,
-			expectFooter: true,
+			expectHeader:           true,
+			expectFooter:           true,
 			expectSignificantNodes: 1, // content div
 			checkHeader: func(t *testing.T, header *dom.VElement) {
 				if header.TagName != "header" {
@@ -473,25 +473,25 @@ func TestFindStructuralElements(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				header := dom.NewVElement("div")
 				header.SetAttribute("id", "header")
 				header.AppendChild(dom.NewVText("This is a header div"))
 				body.AppendChild(header)
-				
+
 				content := dom.NewVElement("main")
 				content.AppendChild(dom.NewVText("This is the main content"))
 				body.AppendChild(content)
-				
+
 				footer := dom.NewVElement("div")
 				footer.SetAttribute("class", "footer")
 				footer.AppendChild(dom.NewVText("This is a footer div"))
 				body.AppendChild(footer)
-				
+
 				return dom.NewVDocument(html, body)
 			},
-			expectHeader: true,
-			expectFooter: true,
+			expectHeader:           true,
+			expectFooter:           true,
 			expectSignificantNodes: 1, // main element
 			checkHeader: func(t *testing.T, header *dom.VElement) {
 				if header.ID() != "header" {
@@ -518,25 +518,25 @@ func TestFindStructuralElements(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				header := dom.NewVElement("div")
 				header.SetAttribute("role", "banner")
 				header.AppendChild(dom.NewVText("This is a header with role"))
 				body.AppendChild(header)
-				
+
 				article := dom.NewVElement("article")
 				article.AppendChild(dom.NewVText("This is an article"))
 				body.AppendChild(article)
-				
+
 				footer := dom.NewVElement("div")
 				footer.SetAttribute("role", "contentinfo")
 				footer.AppendChild(dom.NewVText("This is a footer with role"))
 				body.AppendChild(footer)
-				
+
 				return dom.NewVDocument(html, body)
 			},
-			expectHeader: true,
-			expectFooter: true,
+			expectHeader:           true,
+			expectFooter:           true,
 			expectSignificantNodes: 1, // article element
 			checkHeader: func(t *testing.T, header *dom.VElement) {
 				role := GetAttribute(header, "role")
@@ -565,36 +565,36 @@ func TestFindStructuralElements(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				header := dom.NewVElement("header")
 				header.AppendChild(dom.NewVText("This is a header"))
 				body.AppendChild(header)
-				
+
 				main := dom.NewVElement("main")
 				main.AppendChild(dom.NewVText("This is the main content"))
 				body.AppendChild(main)
-				
+
 				article := dom.NewVElement("article")
 				article.AppendChild(dom.NewVText("This is an article"))
 				body.AppendChild(article)
-				
+
 				section := dom.NewVElement("section")
 				section.SetAttribute("class", "content")
 				section.AppendChild(dom.NewVText("This is a content section"))
 				body.AppendChild(section)
-				
+
 				aside := dom.NewVElement("aside")
 				aside.AppendChild(dom.NewVText("This is an aside"))
 				body.AppendChild(aside)
-				
+
 				footer := dom.NewVElement("footer")
 				footer.AppendChild(dom.NewVText("This is a footer"))
 				body.AppendChild(footer)
-				
+
 				return dom.NewVDocument(html, body)
 			},
-			expectHeader: true,
-			expectFooter: true,
+			expectHeader:           true,
+			expectFooter:           true,
 			expectSignificantNodes: 4, // main, article, section, aside
 			checkHeader: func(t *testing.T, header *dom.VElement) {
 				if header.TagName != "header" {
@@ -610,13 +610,13 @@ func TestFindStructuralElements(t *testing.T) {
 				if len(nodes) < 4 {
 					t.Fatalf("Expected at least 4 significant nodes, got %d", len(nodes))
 				}
-				
+
 				// Check if all expected elements are present
 				foundMain := false
 				foundArticle := false
 				foundSection := false
 				foundAside := false
-				
+
 				for _, node := range nodes {
 					switch node.TagName {
 					case "main":
@@ -629,7 +629,7 @@ func TestFindStructuralElements(t *testing.T) {
 						foundAside = true
 					}
 				}
-				
+
 				if !foundMain {
 					t.Errorf("Expected to find 'main' element in significant nodes")
 				}
@@ -650,31 +650,31 @@ func TestFindStructuralElements(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				main := dom.NewVElement("main")
 				main.AppendChild(dom.NewVText("This is the main content"))
 				body.AppendChild(main)
-				
+
 				article := dom.NewVElement("article")
 				article.AppendChild(dom.NewVText("This is an article"))
 				body.AppendChild(article)
-				
+
 				return dom.NewVDocument(html, body)
 			},
-			expectHeader: false,
-			expectFooter: false,
+			expectHeader:           false,
+			expectFooter:           false,
 			expectSignificantNodes: 2, // main, article
-			checkHeader: nil,
-			checkFooter: nil,
+			checkHeader:            nil,
+			checkFooter:            nil,
 			checkSignificantNodes: func(t *testing.T, nodes []*dom.VElement) {
 				if len(nodes) < 2 {
 					t.Fatalf("Expected at least 2 significant nodes, got %d", len(nodes))
 				}
-				
+
 				// Check if all expected elements are present
 				foundMain := false
 				foundArticle := false
-				
+
 				for _, node := range nodes {
 					switch node.TagName {
 					case "main":
@@ -683,7 +683,7 @@ func TestFindStructuralElements(t *testing.T) {
 						foundArticle = true
 					}
 				}
-				
+
 				if !foundMain {
 					t.Errorf("Expected to find 'main' element in significant nodes")
 				}
@@ -698,7 +698,7 @@ func TestFindStructuralElements(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			doc := tc.setupDoc()
 			header, footer, significantNodes := FindStructuralElements(doc)
-			
+
 			// Check header
 			if tc.expectHeader {
 				if header == nil {
@@ -711,7 +711,7 @@ func TestFindStructuralElements(t *testing.T) {
 					t.Errorf("Expected no header, but got one: %s", header.TagName)
 				}
 			}
-			
+
 			// Check footer
 			if tc.expectFooter {
 				if footer == nil {
@@ -724,12 +724,12 @@ func TestFindStructuralElements(t *testing.T) {
 					t.Errorf("Expected no footer, but got one: %s", footer.TagName)
 				}
 			}
-			
+
 			// Check significant nodes
 			if len(significantNodes) != tc.expectSignificantNodes {
 				t.Errorf("Expected %d significant nodes, got %d", tc.expectSignificantNodes, len(significantNodes))
 			}
-			
+
 			if tc.checkSignificantNodes != nil && len(significantNodes) > 0 {
 				tc.checkSignificantNodes(t, significantNodes)
 			}
@@ -767,8 +767,8 @@ func TestExtract(t *testing.T) {
 </body>
 </html>`,
 			options: ReadabilityOptions{
-				CharThreshold:   500,
-				NbTopCandidates: 5,
+				CharThreshold:    500,
+				NbTopCandidates:  5,
 				GenerateAriaTree: false,
 			},
 			checkResult: func(t *testing.T, result ReadabilityArticle, err error) {
@@ -776,21 +776,21 @@ func TestExtract(t *testing.T) {
 				if err != nil {
 					t.Errorf("Expected no error, got %v", err)
 				}
-				
+
 				// Check title and byline
 				if result.Title != "Test Article" {
 					t.Errorf("Expected title 'Test Article', got '%s'", result.Title)
 				}
-				
+
 				if result.Byline != "Test Author" {
 					t.Errorf("Expected byline 'Test Author', got '%s'", result.Byline)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeArticle {
 					t.Errorf("Expected page type 'article', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction
 				if result.Root == nil {
 					t.Errorf("Expected content to be extracted, but Root is nil")
@@ -799,7 +799,7 @@ func TestExtract(t *testing.T) {
 						t.Errorf("Expected root element to be 'article', got '%s'", result.Root.TagName)
 					}
 				}
-				
+
 				// Check node count
 				if result.NodeCount <= 0 {
 					t.Errorf("Expected positive node count, got %d", result.NodeCount)
@@ -847,17 +847,17 @@ func TestExtract(t *testing.T) {
 				if err != nil {
 					t.Errorf("Expected no error, got %v", err)
 				}
-				
+
 				// Check title
 				if result.Title != "Index Page" {
 					t.Errorf("Expected title 'Index Page', got '%s'", result.Title)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeOther {
 					t.Errorf("Expected page type 'other', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction
 				if result.Root != nil {
 					t.Errorf("Expected content to not be extracted for non-article page, but Root is not nil")
@@ -869,7 +869,7 @@ func TestExtract(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := Extract(tc.html, tc.options)
-			
+
 			if tc.checkResult != nil {
 				tc.checkResult(t, result, err)
 			}
@@ -884,9 +884,9 @@ func TestCreateExtractor(t *testing.T) {
 		NbTopCandidates: 3,
 		ForcedPageType:  PageTypeArticle,
 	}
-	
+
 	extractor := CreateExtractor(options)
-	
+
 	// Test HTML with enough content to pass the threshold
 	html := `<!DOCTYPE html>
 <html>
@@ -905,23 +905,23 @@ func TestCreateExtractor(t *testing.T) {
   </article>
 </body>
 </html>`
-	
+
 	// Extract content using the custom extractor
 	result, err := extractor(html)
-	
+
 	// Check results
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
-	
+
 	if result.Title != "Test Article" {
 		t.Errorf("Expected title 'Test Article', got '%s'", result.Title)
 	}
-	
+
 	if result.PageType != PageTypeArticle {
 		t.Errorf("Expected page type 'article', got '%s'", result.PageType)
 	}
-	
+
 	if result.Root == nil {
 		t.Errorf("Expected content to be extracted, but Root is nil")
 	} else {
@@ -933,10 +933,10 @@ func TestCreateExtractor(t *testing.T) {
 
 func TestExtractContent(t *testing.T) {
 	testCases := []struct {
-		name           string
-		setupDoc       func() *dom.VDocument
-		options        ReadabilityOptions
-		checkResult    func(t *testing.T, result ReadabilityArticle)
+		name        string
+		setupDoc    func() *dom.VDocument
+		options     ReadabilityOptions
+		checkResult func(t *testing.T, result ReadabilityArticle)
 	}{
 		{
 			name: "article page with good content",
@@ -944,24 +944,24 @@ func TestExtractContent(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Add title
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Test Article Title"))
 				head := dom.NewVElement("head")
 				head.AppendChild(title)
 				html.AppendChild(head)
-				
+
 				// Add author meta
 				meta := dom.NewVElement("meta")
 				meta.SetAttribute("name", "author")
 				meta.SetAttribute("content", "Test Author")
 				head.AppendChild(meta)
-				
+
 				// Add main content
 				article := dom.NewVElement("article")
 				article.SetAttribute("class", "content")
-				
+
 				// Add enough text to pass the threshold
 				longText := "This is a long article text that should be considered as content. " +
 					"It has multiple sentences and is definitely longer than the default threshold. " +
@@ -972,17 +972,17 @@ func TestExtractContent(t *testing.T) {
 					"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " +
 					"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " +
 					"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-				
+
 				p := dom.NewVElement("p")
 				p.AppendChild(dom.NewVText(longText))
 				article.AppendChild(p)
 				body.AppendChild(article)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			options: ReadabilityOptions{
-				CharThreshold: 500,
-				NbTopCandidates: 5,
+				CharThreshold:    500,
+				NbTopCandidates:  5,
 				GenerateAriaTree: false,
 			},
 			checkResult: func(t *testing.T, result ReadabilityArticle) {
@@ -990,16 +990,16 @@ func TestExtractContent(t *testing.T) {
 				if result.Title != "Test Article Title" {
 					t.Errorf("Expected title 'Test Article Title', got '%s'", result.Title)
 				}
-				
+
 				if result.Byline != "Test Author" {
 					t.Errorf("Expected byline 'Test Author', got '%s'", result.Byline)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeArticle {
 					t.Errorf("Expected page type 'article', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction
 				if result.Root == nil {
 					t.Errorf("Expected content to be extracted, but Root is nil")
@@ -1007,22 +1007,22 @@ func TestExtractContent(t *testing.T) {
 					if result.Root.TagName != "article" {
 						t.Errorf("Expected root element to be 'article', got '%s'", result.Root.TagName)
 					}
-					
+
 					if result.Root.ClassName() != "content" {
 						t.Errorf("Expected root element to have class 'content', got '%s'", result.Root.ClassName())
 					}
 				}
-				
+
 				// Check node count
 				if result.NodeCount <= 0 {
 					t.Errorf("Expected positive node count, got %d", result.NodeCount)
 				}
-				
+
 				// Check that structural elements are not set
 				if result.Header != nil || result.Footer != nil || len(result.OtherSignificantNodes) > 0 {
 					t.Errorf("Expected structural elements to be nil for article with content")
 				}
-				
+
 				// Check that AriaTree is not generated
 				if result.AriaTree != nil {
 					t.Errorf("Expected AriaTree to be nil when GenerateAriaTree is false")
@@ -1035,66 +1035,66 @@ func TestExtractContent(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Add title
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Short Article"))
 				head := dom.NewVElement("head")
 				head.AppendChild(title)
 				html.AppendChild(head)
-				
+
 				// Add main content with short text
 				article := dom.NewVElement("article")
 				article.SetAttribute("class", "content")
-				
+
 				// Add text below the threshold
 				shortText := "This is a short article text."
-				
+
 				p := dom.NewVElement("p")
 				p.AppendChild(dom.NewVText(shortText))
 				article.AppendChild(p)
 				body.AppendChild(article)
-				
+
 				// Add header and footer
 				header := dom.NewVElement("header")
 				header.AppendChild(dom.NewVText("This is a header"))
 				body.AppendChild(header)
-				
+
 				footer := dom.NewVElement("footer")
 				footer.AppendChild(dom.NewVText("This is a footer"))
 				body.AppendChild(footer)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			options: ReadabilityOptions{
-				CharThreshold: 500,
-				NbTopCandidates: 5,
+				CharThreshold:    500,
+				NbTopCandidates:  5,
 				GenerateAriaTree: false,
-				ForcedPageType: PageTypeArticle, // Force article type
+				ForcedPageType:   PageTypeArticle, // Force article type
 			},
 			checkResult: func(t *testing.T, result ReadabilityArticle) {
 				// Check title
 				if result.Title != "Short Article" {
 					t.Errorf("Expected title 'Short Article', got '%s'", result.Title)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeArticle {
 					t.Errorf("Expected page type 'article', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction failed due to threshold
 				if result.Root != nil {
 					t.Errorf("Expected content to not be extracted due to threshold, but Root is not nil")
 				}
-				
+
 				// Check structural elements are set
 				if result.Header == nil {
 					t.Errorf("Expected header to be set for article without content")
 				} else if result.Header.TagName != "header" {
 					t.Errorf("Expected header tag to be 'header', got '%s'", result.Header.TagName)
 				}
-				
+
 				if result.Footer == nil {
 					t.Errorf("Expected footer to be set for article without content")
 				} else if result.Footer.TagName != "footer" {
@@ -1108,51 +1108,51 @@ func TestExtractContent(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Add title
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Index Page"))
 				head := dom.NewVElement("head")
 				head.AppendChild(title)
 				html.AppendChild(head)
-				
+
 				// Add multiple links to make it look like an index page
 				for i := 0; i < 20; i++ {
 					div := dom.NewVElement("div")
 					div.SetAttribute("class", "item")
-					
+
 					a := dom.NewVElement("a")
 					a.SetAttribute("href", "#")
 					a.AppendChild(dom.NewVText("Link " + strconv.Itoa(i)))
-					
+
 					div.AppendChild(a)
 					body.AppendChild(div)
 				}
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			options: ReadabilityOptions{
-				CharThreshold: 500,
-				NbTopCandidates: 5,
+				CharThreshold:    500,
+				NbTopCandidates:  5,
 				GenerateAriaTree: false,
-				ForcedPageType: PageTypeOther, // Force other type
+				ForcedPageType:   PageTypeOther, // Force other type
 			},
 			checkResult: func(t *testing.T, result ReadabilityArticle) {
 				// Check title
 				if result.Title != "Index Page" {
 					t.Errorf("Expected title 'Index Page', got '%s'", result.Title)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeOther {
 					t.Errorf("Expected page type 'other', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction
 				if result.Root != nil {
 					t.Errorf("Expected content to not be extracted for non-article page, but Root is not nil")
 				}
-				
+
 				// Check node count
 				if result.NodeCount != 0 {
 					t.Errorf("Expected node count to be 0 for non-article page, got %d", result.NodeCount)
@@ -1165,32 +1165,32 @@ func TestExtractContent(t *testing.T) {
 				html := dom.NewVElement("html")
 				body := dom.NewVElement("body")
 				html.AppendChild(body)
-				
+
 				// Add title
 				title := dom.NewVElement("title")
 				title.AppendChild(dom.NewVText("Test Article"))
 				head := dom.NewVElement("head")
 				head.AppendChild(title)
 				html.AppendChild(head)
-				
+
 				// Add main content
 				article := dom.NewVElement("article")
 				article.SetAttribute("class", "content")
-				
+
 				// Add enough text to pass the threshold
 				longText := "This is a long article text that should be considered as content. " +
 					"It has multiple sentences and is definitely longer than the default threshold."
-				
+
 				p := dom.NewVElement("p")
 				p.AppendChild(dom.NewVText(longText))
 				article.AppendChild(p)
 				body.AppendChild(article)
-				
+
 				return dom.NewVDocument(html, body)
 			},
 			options: ReadabilityOptions{
-				CharThreshold: 100, // Lower threshold
-				NbTopCandidates: 5,
+				CharThreshold:    100, // Lower threshold
+				NbTopCandidates:  5,
 				GenerateAriaTree: true, // Enable AriaTree generation
 			},
 			checkResult: func(t *testing.T, result ReadabilityArticle) {
@@ -1198,17 +1198,17 @@ func TestExtractContent(t *testing.T) {
 				if result.Title != "Test Article" {
 					t.Errorf("Expected title 'Test Article', got '%s'", result.Title)
 				}
-				
+
 				// Check page type
 				if result.PageType != PageTypeArticle {
 					t.Errorf("Expected page type 'article', got '%s'", result.PageType)
 				}
-				
+
 				// Check content extraction
 				if result.Root == nil {
 					t.Errorf("Expected content to be extracted, but Root is nil")
 				}
-				
+
 				// AriaTree would be nil in our implementation since we haven't implemented it yet
 				// This test will need to be updated when AriaTree is implemented
 			},
@@ -1219,7 +1219,7 @@ func TestExtractContent(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			doc := tc.setupDoc()
 			result := ExtractContent(doc, tc.options)
-			
+
 			if tc.checkResult != nil {
 				tc.checkResult(t, result)
 			}
@@ -1229,34 +1229,34 @@ func TestExtractContent(t *testing.T) {
 
 func TestAddSignificantElementsByClassOrId(t *testing.T) {
 	testCases := []struct {
-		name           string
-		setupDoc       func() (*dom.VElement, []*dom.VElement)
-		expectedCount  int
-		checkElements  func(t *testing.T, elements []*dom.VElement)
+		name          string
+		setupDoc      func() (*dom.VElement, []*dom.VElement)
+		expectedCount int
+		checkElements func(t *testing.T, elements []*dom.VElement)
 	}{
 		{
 			name: "elements with significant class names",
 			setupDoc: func() (*dom.VElement, []*dom.VElement) {
 				body := dom.NewVElement("body")
-				
+
 				// Create elements with significant class names
 				content := dom.NewVElement("div")
 				content.SetAttribute("class", "content")
 				body.AppendChild(content)
-				
+
 				article := dom.NewVElement("div")
 				article.SetAttribute("class", "article")
 				body.AppendChild(article)
-				
+
 				main := dom.NewVElement("div")
 				main.SetAttribute("class", "main-container")
 				body.AppendChild(main)
-				
+
 				// Create element with non-significant class name
 				other := dom.NewVElement("div")
 				other.SetAttribute("class", "other")
 				body.AppendChild(other)
-				
+
 				return body, []*dom.VElement{}
 			},
 			expectedCount: 3,
@@ -1265,18 +1265,19 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 				foundContent := false
 				foundArticle := false
 				foundMain := false
-				
+
 				for _, el := range elements {
 					className := el.ClassName()
-					if className == "content" {
+					switch className {
+					case "content":
 						foundContent = true
-					} else if className == "article" {
+					case "article":
 						foundArticle = true
-					} else if className == "main-container" {
+					case "main-container":
 						foundMain = true
 					}
 				}
-				
+
 				if !foundContent {
 					t.Errorf("Expected to find element with class 'content'")
 				}
@@ -1292,25 +1293,25 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 			name: "elements with significant IDs",
 			setupDoc: func() (*dom.VElement, []*dom.VElement) {
 				body := dom.NewVElement("body")
-				
+
 				// Create elements with significant IDs
 				content := dom.NewVElement("div")
 				content.SetAttribute("id", "content")
 				body.AppendChild(content)
-				
+
 				article := dom.NewVElement("div")
 				article.SetAttribute("id", "article")
 				body.AppendChild(article)
-				
+
 				blog := dom.NewVElement("div")
 				blog.SetAttribute("id", "blog-post")
 				body.AppendChild(blog)
-				
+
 				// Create element with non-significant ID
 				other := dom.NewVElement("div")
 				other.SetAttribute("id", "other")
 				body.AppendChild(other)
-				
+
 				return body, []*dom.VElement{}
 			},
 			expectedCount: 3,
@@ -1319,18 +1320,19 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 				foundContent := false
 				foundArticle := false
 				foundBlog := false
-				
+
 				for _, el := range elements {
 					id := el.ID()
-					if id == "content" {
+					switch id {
+					case "content":
 						foundContent = true
-					} else if id == "article" {
+					case "article":
 						foundArticle = true
-					} else if id == "blog-post" {
+					case "blog-post":
 						foundBlog = true
 					}
 				}
-				
+
 				if !foundContent {
 					t.Errorf("Expected to find element with id 'content'")
 				}
@@ -1346,28 +1348,28 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 			name: "mixed elements with existing potentialNodes",
 			setupDoc: func() (*dom.VElement, []*dom.VElement) {
 				body := dom.NewVElement("body")
-				
+
 				// Create elements with significant class names and IDs
 				content := dom.NewVElement("div")
 				content.SetAttribute("class", "content")
 				body.AppendChild(content)
-				
+
 				article := dom.NewVElement("div")
 				article.SetAttribute("id", "article")
 				body.AppendChild(article)
-				
+
 				// Create element with non-significant class and ID
 				other := dom.NewVElement("div")
 				other.SetAttribute("class", "other")
 				other.SetAttribute("id", "other")
 				body.AppendChild(other)
-				
+
 				// Create existing potentialNodes
 				main := dom.NewVElement("main")
 				body.AppendChild(main)
-				
+
 				existingNodes := []*dom.VElement{main}
-				
+
 				return body, existingNodes
 			},
 			expectedCount: 3, // main (existing) + content + article
@@ -1376,7 +1378,7 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 				foundMain := false
 				foundContent := false
 				foundArticle := false
-				
+
 				for _, el := range elements {
 					if el.TagName == "main" {
 						foundMain = true
@@ -1386,7 +1388,7 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 						foundArticle = true
 					}
 				}
-				
+
 				if !foundMain {
 					t.Errorf("Expected to find 'main' element")
 				}
@@ -1402,16 +1404,16 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 			name: "no significant elements",
 			setupDoc: func() (*dom.VElement, []*dom.VElement) {
 				body := dom.NewVElement("body")
-				
+
 				// Create elements with non-significant class names and IDs
 				div1 := dom.NewVElement("div")
 				div1.SetAttribute("class", "other")
 				body.AppendChild(div1)
-				
+
 				div2 := dom.NewVElement("div")
 				div2.SetAttribute("id", "other")
 				body.AppendChild(div2)
-				
+
 				return body, []*dom.VElement{}
 			},
 			expectedCount: 0,
@@ -1422,15 +1424,15 @@ func TestAddSignificantElementsByClassOrId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			body, potentialNodes := tc.setupDoc()
-			
+
 			// Call the function
 			AddSignificantElementsByClassOrId(body, &potentialNodes)
-			
+
 			// Check the results
 			if len(potentialNodes) != tc.expectedCount {
 				t.Errorf("Expected %d elements, got %d", tc.expectedCount, len(potentialNodes))
 			}
-			
+
 			if tc.checkElements != nil && len(potentialNodes) > 0 {
 				tc.checkElements(t, potentialNodes)
 			}

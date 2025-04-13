@@ -147,7 +147,7 @@ func ToHTML(element *dom.VElement) string {
 // Returns:
 //   - The escaped string with HTML special characters replaced with entities
 func escapeHTML(str string) string {
-	result := strings.ReplaceAll(str, "&", "&amp;") // Must be first
+	result := strings.ReplaceAll(str, "&", "&amp;")         // Must be first
 	result = strings.ReplaceAll(result, "\u00a0", "&nbsp;") // Handle non-breaking space
 	result = strings.ReplaceAll(result, "<", "&lt;")
 	result = strings.ReplaceAll(result, ">", "&gt;")
@@ -202,14 +202,14 @@ func Stringify(element *dom.VElement) string {
 		} else if elem, ok := dom.AsVElement(child); ok {
 			// Recursively process element nodes
 			childResult := Stringify(elem)
-			
+
 			// Add the child result to our result
 			result.WriteString(childResult)
-			
+
 			// Add a space after the child content if it doesn't end with a space or newline
-			if len(childResult) > 0 && 
-			   !strings.HasSuffix(childResult, " ") && 
-			   !strings.HasSuffix(childResult, "\n") {
+			if len(childResult) > 0 &&
+				!strings.HasSuffix(childResult, " ") &&
+				!strings.HasSuffix(childResult, "\n") {
 				result.WriteString(" ")
 			}
 		}
@@ -250,13 +250,13 @@ func FormatDocument(text string) string {
 	for strings.Contains(result, "\n\n") {
 		result = strings.ReplaceAll(result, "\n\n", "\n")
 	}
-	
+
 	// Remove leading line breaks
 	result = strings.TrimLeft(result, "\n")
-	
+
 	// Remove trailing line breaks
 	result = strings.TrimRight(result, "\n")
-	
+
 	// Remove leading/trailing whitespace
 	return strings.TrimSpace(result)
 }

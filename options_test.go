@@ -46,13 +46,13 @@ func TestReadabilityArticleGetContentByPageType(t *testing.T) {
 
 	// Test case 1: Article page type
 	articlePage := &readability.ReadabilityArticle{
-		Title:    "Test Article",
-		Byline:   "John Doe",
-		Root:     div,
-		NodeCount: 5,
-		PageType: readability.PageTypeArticle,
-		Header:   header,
-		Footer:   footer,
+		Title:                 "Test Article",
+		Byline:                "John Doe",
+		Root:                  div,
+		NodeCount:             5,
+		PageType:              readability.PageTypeArticle,
+		Header:                header,
+		Footer:                footer,
 		OtherSignificantNodes: []*dom.VElement{aside},
 	}
 
@@ -76,13 +76,13 @@ func TestReadabilityArticleGetContentByPageType(t *testing.T) {
 
 	// Test case 2: Other page type
 	otherPage := &readability.ReadabilityArticle{
-		Title:    "Test Page",
-		Byline:   "",
-		Root:     nil,
-		NodeCount: 5,
-		PageType: readability.PageTypeOther,
-		Header:   header,
-		Footer:   footer,
+		Title:                 "Test Page",
+		Byline:                "",
+		Root:                  nil,
+		NodeCount:             5,
+		PageType:              readability.PageTypeOther,
+		Header:                header,
+		Footer:                footer,
 		OtherSignificantNodes: []*dom.VElement{aside},
 		AriaTree: &readability.AriaTree{
 			Root:      &readability.AriaNode{Type: readability.AriaNodeTypeGeneric},

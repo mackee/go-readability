@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,7 +30,11 @@ func main() {
 			fmt.Fprintf(os.Stderr, "CPUプロファイルの作成に失敗しました: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				fmt.Fprintf(os.Stderr, "CPUプロファイルのクローズに失敗しました: %v\n", err)
+			}
+		}()
 		if err := pprof.StartCPUProfile(f); err != nil {
 			fmt.Fprintf(os.Stderr, "CPUプロファイリングの開始に失敗しました: %v\n", err)
 			os.Exit(1)
@@ -44,7 +47,7 @@ func main() {
 	var err error
 	if *htmlFile != "" {
 		// 指定されたHTMLファイルを読み込む
-		htmlBytes, err := ioutil.ReadFile(*htmlFile)
+		htmlBytes, err := os.ReadFile(*htmlFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "HTMLファイルの読み込みに失敗しました: %v\n", err)
 			os.Exit(1)
@@ -53,7 +56,7 @@ func main() {
 	} else {
 		// テストケースのHTMLを読み込む
 		sourcePath := filepath.Join(*testCaseDir, "source.html")
-		htmlBytes, err := ioutil.ReadFile(sourcePath)
+		htmlBytes, err := os.ReadFile(sourcePath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "テストケースのHTMLファイルの読み込みに失敗しました: %v\n", err)
 			os.Exit(1)
@@ -103,7 +106,11 @@ func main() {
 			fmt.Fprintf(os.Stderr, "メモリプロファイルの作成に失敗しました: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				fmt.Fprintf(os.Stderr, "メモリプロファイルのクローズに失敗しました: %v\n", err)
+			}
+		}()
 		runtime.GC() // メモリプロファイリング前にGCを実行
 		if err := pprof.WriteHeapProfile(f); err != nil {
 			fmt.Fprintf(os.Stderr, "メモリプロファイルの書き込みに失敗しました: %v\n", err)

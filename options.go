@@ -40,8 +40,8 @@ type ReadabilityOptions struct {
 //   - A ReadabilityOptions struct initialized with default values
 func DefaultOptions() ReadabilityOptions {
 	return ReadabilityOptions{
-		CharThreshold:   500,    // Default minimum character threshold
-		NbTopCandidates: 5,      // Default number of top candidates
+		CharThreshold:    500,   // Default minimum character threshold
+		NbTopCandidates:  5,     // Default number of top candidates
 		GenerateAriaTree: false, // By default, don't generate ARIA tree
 	}
 }

@@ -4,7 +4,6 @@
 package readability
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -25,7 +24,7 @@ const (
 	AriaNodeTypeNavigation    AriaNodeType = "navigation"
 	AriaNodeTypeRegion        AriaNodeType = "region"
 	AriaNodeTypeSearch        AriaNodeType = "search"
-	
+
 	// ARIA widget roles
 	AriaNodeTypeArticle      AriaNodeType = "article"
 	AriaNodeTypeButton       AriaNodeType = "button"
@@ -425,9 +424,9 @@ func BuildAriaNode(element *dom.VElement) *AriaNode {
 		}
 
 		childNode := BuildAriaNode(childElement)
-		
+
 		// Only add meaningful child nodes
-		if childNode.Name != "" || childNode.Type != AriaNodeTypeGeneric || (childNode.Children != nil && len(childNode.Children) > 0) {
+		if childNode.Name != "" || childNode.Type != AriaNodeTypeGeneric || len(childNode.Children) > 0 {
 			childNodes = append(childNodes, childNode)
 		}
 	}
@@ -450,7 +449,7 @@ func BuildAriaNode(element *dom.VElement) *AriaNode {
 // Returns:
 //   - true if the node is insignificant, false otherwise
 func isInsignificantNode(node *AriaNode) bool {
-	return node.Name == "" && node.Type == AriaNodeTypeGeneric && (node.Children == nil || len(node.Children) == 0)
+	return node.Name == "" && node.Type == AriaNodeTypeGeneric && len(node.Children) == 0
 }
 
 // CountAriaNodes counts the total number of nodes in an AriaNode tree.
@@ -467,7 +466,7 @@ func CountAriaNodes(node *AriaNode) int {
 	}
 
 	count := 1 // Count the node itself
-	if node.Children != nil {
+	if len(node.Children) > 0 {
 		for _, child := range node.Children {
 			count += CountAriaNodes(child)
 		}
@@ -490,7 +489,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 	}
 
 	// If no children, return as is (with possible text content check)
-	if node.Children == nil || len(node.Children) == 0 {
+	if len(node.Children) == 0 {
 		// Remove empty text nodes
 		if node.Type == AriaNodeTypeText && (node.Name == "" || strings.TrimSpace(node.Name) == "") {
 			return &AriaNode{
@@ -508,7 +507,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 		compressed := CompressAriaTree(child)
 		if compressed != nil && !isInsignificantNode(compressed) {
 			// Filter out empty text nodes
-			if !(compressed.Type == AriaNodeTypeText && (compressed.Name == "" || strings.TrimSpace(compressed.Name) == "")) {
+			if compressed.Type != AriaNodeTypeText || (compressed.Name != "" && strings.TrimSpace(compressed.Name) != "") {
 				processedChildren = append(processedChildren, compressed)
 			}
 		}
@@ -518,12 +517,12 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 	if node.Type == AriaNodeTypeText && len(processedChildren) == 1 {
 		significantChild := processedChildren[0]
 		significantTypes := map[AriaNodeType]bool{
-			AriaNodeTypeMain:          true,
-			AriaNodeTypeArticle:       true,
-			AriaNodeTypeRegion:        true,
-			AriaNodeTypeNavigation:    true,
-			AriaNodeTypeBanner:        true,
-			AriaNodeTypeContentInfo:   true,
+			AriaNodeTypeMain:        true,
+			AriaNodeTypeArticle:     true,
+			AriaNodeTypeRegion:      true,
+			AriaNodeTypeNavigation:  true,
+			AriaNodeTypeBanner:      true,
+			AriaNodeTypeContentInfo: true,
 		}
 
 		if significantTypes[significantChild.Type] {
@@ -548,7 +547,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 		if allGeneric {
 			var newChildren []*AriaNode
 			for _, child := range processedChildren {
-				if child.Children != nil && len(child.Children) > 0 {
+				if len(child.Children) > 0 {
 					newChildren = append(newChildren, child.Children...)
 				}
 			}
@@ -580,14 +579,14 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 
 	// Check if this is a significant structural node
 	isSignificantNode := map[AriaNodeType]bool{
-		AriaNodeTypeMain:          true,
-		AriaNodeTypeArticle:       true,
-		AriaNodeTypeRegion:        true,
-		AriaNodeTypeNavigation:    true,
-		AriaNodeTypeBanner:        true,
-		AriaNodeTypeContentInfo:   true,
-		AriaNodeTypeForm:          true,
-		AriaNodeTypeSearch:        true,
+		AriaNodeTypeMain:        true,
+		AriaNodeTypeArticle:     true,
+		AriaNodeTypeRegion:      true,
+		AriaNodeTypeNavigation:  true,
+		AriaNodeTypeBanner:      true,
+		AriaNodeTypeContentInfo: true,
+		AriaNodeTypeForm:        true,
+		AriaNodeTypeSearch:      true,
 	}[node.Type]
 
 	// Handle generic children under significant nodes
@@ -611,7 +610,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 			var newChildren []*AriaNode
 			for _, child := range processedChildren {
 				if child.Type == AriaNodeTypeGeneric {
-					if child.Children != nil && len(child.Children) > 0 {
+					if len(child.Children) > 0 {
 						newChildren = append(newChildren, child.Children...)
 					}
 				} else {
@@ -634,8 +633,8 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 
 	// Group specific types of nodes
 	for _, child := range processedChildren {
-		if child.Type == AriaNodeTypeArticle || child.Type == AriaNodeTypeRegion || 
-		   child.Type == AriaNodeTypeListItem || child.Type == AriaNodeTypeImg {
+		if child.Type == AriaNodeTypeArticle || child.Type == AriaNodeTypeRegion ||
+			child.Type == AriaNodeTypeListItem || child.Type == AriaNodeTypeImg {
 			groupByType[child.Type] = append(groupByType[child.Type], child)
 			continue
 		}
@@ -659,7 +658,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 		}
 
 		// Merge children
-		if child.Children != nil && len(child.Children) > 0 {
+		if len(child.Children) > 0 {
 			if currentGroup.Children == nil {
 				currentGroup.Children = make([]*AriaNode, 0, len(child.Children))
 			}
@@ -688,14 +687,14 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 		child := mergedChildren[i]
 
 		// Flatten single-child nodes
-		if child.Children != nil && len(child.Children) == 1 {
+		if len(child.Children) == 1 {
 			grandchild := child.Children[0]
 
 			// Merge if same type or special case
-			if child.Type == grandchild.Type || 
-			   (child.Type == AriaNodeTypeText && (grandchild.Type == AriaNodeTypeMain || 
-												  grandchild.Type == AriaNodeTypeArticle || 
-												  grandchild.Type == AriaNodeTypeRegion)) {
+			if child.Type == grandchild.Type ||
+				(child.Type == AriaNodeTypeText && (grandchild.Type == AriaNodeTypeMain ||
+					grandchild.Type == AriaNodeTypeArticle ||
+					grandchild.Type == AriaNodeTypeRegion)) {
 				// Merge names
 				if grandchild.Name != "" {
 					if child.Name != "" {
@@ -706,7 +705,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 				}
 
 				// Move grandchild's children to child
-				if grandchild.Children != nil && len(grandchild.Children) > 0 {
+				if len(grandchild.Children) > 0 {
 					child.Children = grandchild.Children
 					i-- // Process this node again
 					continue
@@ -717,7 +716,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 		}
 
 		// Handle multiple children with same type as parent
-		if child.Children != nil && len(child.Children) > 1 {
+		if len(child.Children) > 1 {
 			var sameTypeChildren []*AriaNode
 			var otherChildren []*AriaNode
 
@@ -743,7 +742,7 @@ func CompressAriaTree(node *AriaNode) *AriaNode {
 					}
 
 					// Add same-type children's children
-					if sameChild.Children != nil && len(sameChild.Children) > 0 {
+					if len(sameChild.Children) > 0 {
 						newChildren = append(newChildren, sameChild.Children...)
 					}
 				}
@@ -787,13 +786,13 @@ func BuildAriaTree(doc *dom.VDocument) *AriaTree {
 	compressedRoot := CompressAriaTree(rootNode)
 
 	// Handle special case for root level nesting
-	if compressedRoot.Type == AriaNodeTypeText && compressedRoot.Children != nil && len(compressedRoot.Children) > 0 {
+	if compressedRoot.Type == AriaNodeTypeText && len(compressedRoot.Children) > 0 {
 		// Look for significant child nodes
 		var significantChild *AriaNode
 		for _, child := range compressedRoot.Children {
-			if child.Type == AriaNodeTypeMain || child.Type == AriaNodeTypeArticle || 
-			   child.Type == AriaNodeTypeRegion || child.Type == AriaNodeTypeNavigation || 
-			   child.Type == AriaNodeTypeBanner || child.Type == AriaNodeTypeContentInfo {
+			if child.Type == AriaNodeTypeMain || child.Type == AriaNodeTypeArticle ||
+				child.Type == AriaNodeTypeRegion || child.Type == AriaNodeTypeNavigation ||
+				child.Type == AriaNodeTypeBanner || child.Type == AriaNodeTypeContentInfo {
 				significantChild = child
 				break
 			}
@@ -820,11 +819,7 @@ func BuildAriaTree(doc *dom.VDocument) *AriaTree {
 			}
 
 			// Move child's children to root
-			if child.Children != nil && len(child.Children) > 0 {
-				compressedRoot.Children = child.Children
-			} else {
-				compressedRoot.Children = nil
-			}
+			compressedRoot.Children = child.Children
 		}
 	}
 
@@ -837,20 +832,19 @@ func BuildAriaTree(doc *dom.VDocument) *AriaTree {
 	}
 }
 
-// AriaTreeToString converts an AriaTree to a YAML-like string format
-// compatible with Playwright's snapshot format. This is useful for debugging
-// and visualizing the accessibility structure of a document.
+// AriaTreeToString converts an AriaTree to a string representation.
+// This is useful for debugging and visualizing the accessibility structure of a document.
 //
 // Parameters:
 //   - tree: The AriaTree to convert to a string
 //
 // Returns:
-//   - A YAML-like string representation of the tree
+//   - A string representation of the tree
 func AriaTreeToString(tree *AriaTree) string {
 	if tree == nil || tree.Root == nil {
 		return ""
 	}
-	
+
 	var sb strings.Builder
 	nodeToString(tree.Root, 0, &sb)
 	return sb.String()
@@ -869,151 +863,95 @@ func nodeToString(node *AriaNode, indent int, sb *strings.Builder) {
 		return
 	}
 
-	// Skip empty nodes
-	if (node.Name == "" && node.Children == nil && node.Type == AriaNodeTypeGeneric) ||
-	   node.Name == "" ||
-	   (node.Type == AriaNodeTypeList && (node.Children == nil || len(node.Children) == 0 || func() bool {
-			for _, child := range node.Children {
-				if child.Name != "" || (child.Children != nil && len(child.Children) > 0) {
-					return false
-				}
-			}
-			return true
-		}())) {
-		return
-	}
-
-	// Indent
+	// Indent based on level
 	indentStr := strings.Repeat("  ", indent)
-	sb.WriteString(fmt.Sprintf("%s- %s", indentStr, node.Type))
 
-	// Get href for links, src and alt for images
-	var href, src, alt string
-	if node.OriginalElement != nil {
-		if node.Type == AriaNodeTypeLink {
-			href = node.OriginalElement.Attributes["href"]
-		} else if node.Type == AriaNodeTypeImg {
-			src = node.OriginalElement.Attributes["src"]
-			alt = node.OriginalElement.Attributes["alt"]
-		}
-	}
+	// Node type and name
+	sb.WriteString(indentStr)
+	sb.WriteString(string(node.Type))
 
-	// Add name based on node type
 	if node.Name != "" {
-		// Check if name is a regex pattern
-		if strings.HasPrefix(node.Name, "/") && strings.HasSuffix(node.Name, "/") {
-			sb.WriteString(fmt.Sprintf(" %s", node.Name))
-		} else if node.Type == AriaNodeTypeText || node.Type == AriaNodeTypeListItem || node.Type == AriaNodeTypeTextBox {
-			// Colon format for text nodes
-			sb.WriteString(fmt.Sprintf(": %s", node.Name))
-		} else {
-			// Quote format for other nodes
-			sb.WriteString(fmt.Sprintf(" \"%s\"", node.Name))
-		}
+		sb.WriteString(": ")
+		sb.WriteString(node.Name)
 	}
-
-	// Add href, src, alt attributes
-	if href != "" {
-		sb.WriteString(fmt.Sprintf(" [href=\"%s\"]", href))
-	}
-	if src != "" {
-		sb.WriteString(fmt.Sprintf(" [src=\"%s\"]", src))
-	}
-	if alt != "" {
-		sb.WriteString(fmt.Sprintf(" [alt=\"%s\"]", alt))
-	}
-
-	// Add other attributes
-	var attributes []string
-
-	// Heading level
-	if node.Level > 0 {
-		attributes = append(attributes, fmt.Sprintf("level=%d", node.Level))
-	}
-
-	// Checkbox state
-	if node.Checked != nil {
-		attributes = append(attributes, fmt.Sprintf("checked=%t", *node.Checked))
-	}
-
-	// Selection state
-	if node.Selected != nil {
-		attributes = append(attributes, fmt.Sprintf("selected=%t", *node.Selected))
-	}
-
-	// Expansion state
-	if node.Expanded != nil {
-		attributes = append(attributes, fmt.Sprintf("expanded=%t", *node.Expanded))
-	}
-
-	// Disabled state
-	if node.Disabled != nil && *node.Disabled {
-		attributes = append(attributes, "disabled")
-	}
-
-	// Required state
-	if node.Required != nil && *node.Required {
-		attributes = append(attributes, "required")
-	}
-
-	// Value range
-	if node.ValueMin != nil || node.ValueMax != nil {
-		min := ""
-		max := ""
-		if node.ValueMin != nil {
-			min = fmt.Sprintf("%g", *node.ValueMin)
-		}
-		if node.ValueMax != nil {
-			max = fmt.Sprintf("%g", *node.ValueMax)
-		}
-		attributes = append(attributes, fmt.Sprintf("range=%s-%s", min, max))
-	}
-
-	// Value text
-	if node.ValueText != "" {
-		attributes = append(attributes, fmt.Sprintf("value=\"%s\"", node.ValueText))
-	}
-
-	// Add attributes if any
-	if len(attributes) > 0 {
-		sb.WriteString(fmt.Sprintf(" [%s]", strings.Join(attributes, ", ")))
-	}
-
 	sb.WriteString("\n")
 
-	// Process children
-	if node.Children != nil && len(node.Children) > 0 {
-		// Special case: if only one child with same type
-		if len(node.Children) == 1 && node.Children[0].Type == node.Type && node.Type != AriaNodeTypeGeneric {
-			child := node.Children[0]
-			
-			// Combine names
-			combinedName := ""
-			if node.Name != "" && child.Name != "" {
-				combinedName = node.Name + " " + child.Name
-			} else {
-				combinedName = node.Name + child.Name
-			}
-			
-			// Create temporary node with combined properties
-			tempNode := *node // Copy the node
-			tempNode.Name = combinedName
-			
-			// Set children from the child's children
-			if child.Children != nil && len(child.Children) > 0 {
-				tempNode.Children = child.Children
-			} else {
-				tempNode.Children = nil
-			}
-			
-			// Process this node instead
-			nodeToString(&tempNode, indent, sb)
-			return
+	// Add properties if present
+	if node.Level > 0 {
+		sb.WriteString(indentStr)
+		sb.WriteString("  level: ")
+		sb.WriteString(strconv.Itoa(node.Level))
+		sb.WriteString("\n")
+	}
+
+	if node.Checked != nil {
+		sb.WriteString(indentStr)
+		sb.WriteString("  checked: ")
+		sb.WriteString(strconv.FormatBool(*node.Checked))
+		sb.WriteString("\n")
+	}
+
+	if node.Selected != nil {
+		sb.WriteString(indentStr)
+		sb.WriteString("  selected: ")
+		sb.WriteString(strconv.FormatBool(*node.Selected))
+		sb.WriteString("\n")
+	}
+
+	if node.Expanded != nil {
+		sb.WriteString(indentStr)
+		sb.WriteString("  expanded: ")
+		sb.WriteString(strconv.FormatBool(*node.Expanded))
+		sb.WriteString("\n")
+	}
+
+	if node.Disabled != nil {
+		sb.WriteString(indentStr)
+		sb.WriteString("  disabled: ")
+		sb.WriteString(strconv.FormatBool(*node.Disabled))
+		sb.WriteString("\n")
+	}
+
+	if node.Required != nil {
+		sb.WriteString(indentStr)
+		sb.WriteString("  required: ")
+		sb.WriteString(strconv.FormatBool(*node.Required))
+		sb.WriteString("\n")
+	}
+
+	if node.ValueMin != nil || node.ValueMax != nil || node.ValueText != "" {
+		sb.WriteString(indentStr)
+		sb.WriteString("  value:\n")
+
+		if node.ValueMin != nil {
+			sb.WriteString(indentStr)
+			sb.WriteString("    min: ")
+			sb.WriteString(strconv.FormatFloat(*node.ValueMin, 'g', -1, 64))
+			sb.WriteString("\n")
 		}
-		
-		// Normal child processing
+
+		if node.ValueMax != nil {
+			sb.WriteString(indentStr)
+			sb.WriteString("    max: ")
+			sb.WriteString(strconv.FormatFloat(*node.ValueMax, 'g', -1, 64))
+			sb.WriteString("\n")
+		}
+
+		if node.ValueText != "" {
+			sb.WriteString(indentStr)
+			sb.WriteString("    text: ")
+			sb.WriteString(node.ValueText)
+			sb.WriteString("\n")
+		}
+	}
+
+	// Add children if present
+	if len(node.Children) > 0 {
+		sb.WriteString(indentStr)
+		sb.WriteString("  children:\n")
+
 		for _, child := range node.Children {
-			nodeToString(child, indent+1, sb)
+			nodeToString(child, indent+2, sb)
 		}
 	}
 }

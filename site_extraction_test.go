@@ -18,9 +18,9 @@ type TestPage struct {
 	ExpectedContent  string
 	ExpectedMetadata struct {
 		Title         string      `json:"title"`
-		Byline        interface{} `json:"byline"` // string または null
-		Dir           interface{} `json:"dir"`    // string または null
-		Lang          interface{} `json:"lang"`   // string または null
+		Byline        interface{} `json:"byline"`        // string または null
+		Dir           interface{} `json:"dir"`           // string または null
+		Lang          interface{} `json:"lang"`          // string または null
 		Excerpt       interface{} `json:"excerpt"`       // string または null
 		SiteName      interface{} `json:"siteName"`      // string または null
 		PublishedTime interface{} `json:"publishedTime"` // string または null
@@ -90,14 +90,6 @@ func getTestPages(t *testing.T) []TestPage {
 	return testPages
 }
 
-// htmlTransform は、連続する空白を1つの空白に置き換えます（HTMLの表示と同様）
-func htmlTransform(s string) string {
-	if s == "" {
-		return ""
-	}
-	return strings.Join(strings.Fields(s), " ")
-}
-
 // TestSiteExtraction は、実際のウェブサイトからのコンテンツ抽出をテストします
 func TestSiteExtraction(t *testing.T) {
 	testPages := getTestPages(t)
@@ -128,18 +120,18 @@ func TestSiteExtraction(t *testing.T) {
 			// 空白を正規化して比較
 			normalizedExtracted := strings.TrimSpace(extractedHTML)
 			normalizedExpected := strings.TrimSpace(testPage.ExpectedContent)
-			
+
 			// 完全一致ではなく、主要な部分が含まれているかを確認
 			// 実装の違いにより、完全に同じHTMLにはならない可能性があるため
-			if !strings.Contains(normalizedExtracted, "<section>") || 
-			   !strings.Contains(normalizedExpected, "<section>") {
-				t.Errorf("抽出されたコンテンツが期待と異なります\n期待: %s\n実際: %s", 
+			if !strings.Contains(normalizedExtracted, "<section>") ||
+				!strings.Contains(normalizedExpected, "<section>") {
+				t.Errorf("抽出されたコンテンツが期待と異なります\n期待: %s\n実際: %s",
 					normalizedExpected, normalizedExtracted)
 			}
 
 			// タイトルを比較
 			if result.Title != testPage.ExpectedMetadata.Title {
-				t.Errorf("タイトルが期待と異なります\n期待: %s\n実際: %s", 
+				t.Errorf("タイトルが期待と異なります\n期待: %s\n実際: %s",
 					testPage.ExpectedMetadata.Title, result.Title)
 			}
 
@@ -152,7 +144,7 @@ func TestSiteExtraction(t *testing.T) {
 			}
 			if result.Byline != expectedByline {
 				// エラーではなく警告として出力
-				t.Logf("bylineが期待と異なります（警告）\n期待: %s\n実際: %s", 
+				t.Logf("bylineが期待と異なります（警告）\n期待: %s\n実際: %s",
 					expectedByline, result.Byline)
 			}
 
@@ -214,7 +206,7 @@ func TestSiteReaderability(t *testing.T) {
 			// それに対してIsProbablyContentを適用します
 			mainElements := GetElementsByTagName(doc.DocumentElement, "main")
 			articleElements := GetElementsByTagName(doc.DocumentElement, "article")
-			
+
 			var targetElement *dom.VElement
 			if len(mainElements) > 0 {
 				targetElement = mainElements[0]
@@ -224,14 +216,14 @@ func TestSiteReaderability(t *testing.T) {
 				// mainやarticleがない場合はbodyを使用
 				targetElement = doc.Body
 			}
-			
+
 			isContent := IsProbablyContent(targetElement)
 			expectedReaderable := testPage.ExpectedMetadata.Readerable
 
 			// 注意: IsProbablyContentとIsProbablyReaderableは完全に同じではないため、
 			// テスト結果が異なる可能性があります
 			if isContent != expectedReaderable {
-				t.Logf("IsProbablyContentの結果が期待と異なります（警告）\n期待: %v\n実際: %v", 
+				t.Logf("IsProbablyContentの結果が期待と異なります（警告）\n期待: %v\n実際: %v",
 					expectedReaderable, isContent)
 			}
 		})

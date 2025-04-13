@@ -420,9 +420,10 @@ func convertNodeToMarkdown(node dom.VNode, parentTagName string, depth int, isFi
 		for _, child := range elementNode.Children {
 			if childElement, ok := dom.AsVElement(child); ok {
 				childTagName := strings.ToLower(childElement.TagName)
-				if childTagName == "thead" {
+				switch childTagName {
+				case "thead":
 					thead = childElement
-				} else if childTagName == "tbody" {
+				case "tbody":
 					tbody = childElement
 				}
 			}

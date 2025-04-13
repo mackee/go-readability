@@ -10,17 +10,17 @@ import (
 // ReadabilityArticle represents the result of a readability extraction.
 // It contains the extracted content, metadata, and structural information about the page.
 type ReadabilityArticle struct {
-	Title       string        // Extracted title
-	Byline      string        // Extracted byline/author information
-	Root        *dom.VElement // Main content root element (if score threshold is met)
-	NodeCount   int           // Total number of nodes
-	PageType    PageType      // Classification of page type
-	
+	Title     string        // Extracted title
+	Byline    string        // Extracted byline/author information
+	Root      *dom.VElement // Main content root element (if score threshold is met)
+	NodeCount int           // Total number of nodes
+	PageType  PageType      // Classification of page type
+
 	// Structural elements (set when PageType is ARTICLE but Root is nil)
-	Header              *dom.VElement   // Page header element, if identified
-	Footer              *dom.VElement   // Page footer element, if identified
+	Header                *dom.VElement   // Page header element, if identified
+	Footer                *dom.VElement   // Page footer element, if identified
 	OtherSignificantNodes []*dom.VElement // Other semantically significant nodes
-	
+
 	// Fallback when article extraction fails
 	AriaTree *AriaTree // ARIA tree representation
 }
@@ -37,11 +37,11 @@ type ArticleContent struct {
 // This is used for pages that don't fit the article pattern, such as index pages,
 // landing pages, or other non-article content.
 type OtherContent struct {
-	Title                string          // Extracted title
-	Header               *dom.VElement   // Page header, if identified
-	Footer               *dom.VElement   // Page footer, if identified
+	Title                 string          // Extracted title
+	Header                *dom.VElement   // Page header, if identified
+	Footer                *dom.VElement   // Page footer, if identified
 	OtherSignificantNodes []*dom.VElement // Other semantically significant nodes
-	AriaTree             *AriaTree       // ARIA tree representation
+	AriaTree              *AriaTree       // ARIA tree representation
 }
 
 // GetContentByPageType returns the appropriate content structure based on page type.
@@ -60,11 +60,11 @@ func (r *ReadabilityArticle) GetContentByPageType() interface{} {
 		}
 	} else {
 		return OtherContent{
-			Title:                r.Title,
-			Header:               r.Header,
-			Footer:               r.Footer,
+			Title:                 r.Title,
+			Header:                r.Header,
+			Footer:                r.Footer,
 			OtherSignificantNodes: r.OtherSignificantNodes,
-			AriaTree:             r.AriaTree,
+			AriaTree:              r.AriaTree,
 		}
 	}
 }

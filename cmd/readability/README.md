@@ -11,7 +11,7 @@ go install github.com/mackee/go-readability/cmd/readability@latest
 ## Usage
 
 ```bash
-readability [options] <url>
+readability [options] <url|file_path>
 ```
 
 ### Options
@@ -25,6 +25,11 @@ readability [options] <url>
 Extract content from a URL and output as HTML:
 ```bash
 readability https://example.com/article
+```
+
+Extract content from a local file and output as HTML:
+```bash
+readability ./article.html
 ```
 
 Extract content and output as Markdown:

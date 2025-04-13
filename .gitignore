@@ -1,0 +1,6 @@
+external-docs
+external-tools
+.vscode
+cmd/benchmark/*.prof
+cmd/readability/readability
+cmd/benchmark/benchmark

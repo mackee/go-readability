@@ -14,6 +14,12 @@ go install github.com/mackee/go-readability/cmd/readability@latest
 readability [options] <url|file_path>
 ```
 
+or
+
+```bash
+cat <file_path> | readability [options]
+```
+
 ### Options
 
 - `--format <format>`: Output format (html or markdown, default: html)
@@ -40,6 +46,11 @@ readability --format markdown https://example.com/article
 Extract metadata only:
 ```bash
 readability --metadata https://example.com/article
+```
+
+Extract content from stdin and output as Markdown:
+```bash
+cat ./article.html | readability --format markdown
 ```
 
 Save the extracted content to a file:

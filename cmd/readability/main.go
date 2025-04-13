@@ -21,16 +21,18 @@ func main() {
 	helpFlag := flag.Bool("help", false, "Show help")
 	flag.Parse()
 
-	// Show help if requested or no URL provided
-	if *helpFlag || flag.NArg() < 1 {
+	// Show help if requested
+	if *helpFlag {
 		printUsage()
 		os.Exit(0)
 	}
 
-	// Get the URL or file path from command-line arguments
-	src := flag.Arg(0)
-
 	body, err := func() ([]byte, error) {
+		if flag.NArg() == 0 {
+			return readStdin()
+		}
+		// Get the URL or file path from command-line arguments
+		src := flag.Arg(0)
 		if isRequestURL(src) {
 			return fetchContent(src)
 		}
@@ -79,6 +81,16 @@ func main() {
 			log.Fatalf("Unknown format: %s", *formatFlag)
 		}
 	}
+}
+
+func readStdin() ([]byte, error) {
+	// limit to 1GiB to avoid blocking of command execution
+	r := io.LimitReader(os.Stdin, 1024*1024*1024)
+	body, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read stdin: %w", err)
+	}
+	return body, nil
 }
 
 func isRequestURL(s string) bool {
@@ -132,6 +144,8 @@ func parseContent(body []byte) (*readability.ReadabilityArticle, error) {
 // printUsage prints the usage information
 func printUsage() {
 	fmt.Println("Usage: readability [options] <url|file_path>")
+	fmt.Println("\nreadability is a command-line tool that extracts the main content from a web page.")
+	fmt.Println("The web page to be processed can be specified as a URL, a file path, or stdin.")
 	fmt.Println("\nOptions:")
 	fmt.Println("  --format <format>  Output format: html or markdown (default: html)")
 	fmt.Println("  --metadata         Output metadata as JSON instead of content")
@@ -141,4 +155,5 @@ func printUsage() {
 	fmt.Println("  readability ./article.html")
 	fmt.Println("  readability --format markdown https://example.com/article")
 	fmt.Println("  readability --metadata https://example.com/article")
+	fmt.Println("  cat ./article.html | readability --format markdown")
 }

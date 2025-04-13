@@ -27,7 +27,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Get the URL from command-line arguments
+	// Get the URL or file path from command-line arguments
 	src := flag.Arg(0)
 
 	body, err := func() ([]byte, error) {

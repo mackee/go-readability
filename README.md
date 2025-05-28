@@ -31,8 +31,15 @@ func main() {
 	}
 	defer resp.Body.Close()
 
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Parse and extract the main content
-	article, err := readability.FromReader(resp.Body, "https://example.com/article")
+	options := readability.DefaultOptions()
+	article, err := readability.Extract(string(body), options)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,17 +47,18 @@ func main() {
 	// Access the extracted content
 	fmt.Println("Title:", article.Title)
 	fmt.Println("Byline:", article.Byline)
-	fmt.Println("Content:", article.Content)
-	
+
 	// Get content as HTML
-	html := article.Content
-	
-	// Get content as plain text
-	text := article.TextContent
-	
-	// Get metadata
-	fmt.Println("Excerpt:", article.Excerpt)
-	fmt.Println("SiteName:", article.SiteName)
+	if article.Root != nil {
+		html := readability.ToHTML(article.Root)
+		fmt.Println("HTML Content:", html)
+	}
+
+	// Convert to Markdown
+	if article.Root != nil {
+		markdown := readability.ToMarkdown(article.Root)
+		fmt.Println("Markdown Content:", markdown)
+	}
 }
 ```
 
